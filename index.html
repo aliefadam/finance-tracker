@@ -516,6 +516,7 @@
   let transactions = [];
   let editingId = null;
   let currentTypeUI = 'income';
+  const DATA_ENDPOINT = '/api/data';
 
   // ── Init ──────────────────────────────────────
   window.addEventListener('DOMContentLoaded', async () => {
@@ -596,7 +597,7 @@
   // ── LocalStorage ─────────────────────────────
   async function loadData() {
     try {
-      const res = await fetch('/data.json', { cache: 'no-store' });
+      const res = await fetch(DATA_ENDPOINT, { cache: 'no-store' });
       if (!res.ok) throw new Error('Gagal memuat data');
       const data = await res.json();
       transactions = Array.isArray(data) ? data : [];
@@ -608,7 +609,7 @@
   }
   async function saveData() {
     try {
-      const res = await fetch('/data.json', {
+      const res = await fetch(DATA_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(transactions)
