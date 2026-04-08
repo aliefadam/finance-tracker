@@ -689,7 +689,7 @@
             0 transaksi
           </p>
         </div>
-        <!-- Balance today card -->
+        <!-- Monthly summary card -->
         <div
           class="card-balance bg-white rounded-2xl shadow-card hover:shadow-card-hover transition-all p-6"
         >
@@ -698,28 +698,43 @@
               class="w-10 h-10 rounded-xl bg-balance-50 flex items-center justify-center"
             >
               <i
-                data-lucide="calendar-clock"
+                data-lucide="calendar-range"
                 class="w-5 h-5 text-balance-600"
               ></i>
             </div>
             <span
               class="text-xs font-semibold text-balance-600 bg-balance-50 px-2.5 py-1 rounded-full"
-              >Hari ini</span
+              >Bulan ini</span
             >
           </div>
           <p
             class="text-slate-500 text-xs font-semibold uppercase tracking-wide"
           >
-            Saldo Hari Ini
+            Ringkasan Bulanan
           </p>
-          <p
-            id="sum-balance-today"
-            class="text-2xl font-extrabold text-slate-800 mt-1"
-          >
-            Rp 0
+          <p id="month-summary-label" class="text-xs text-slate-400 mt-1">
+            -
           </p>
-          <p id="balance-today-label" class="text-xs text-slate-400 mt-1">
-            Impas hari ini
+          <div class="grid grid-cols-2 gap-3 mt-4">
+            <div class="rounded-xl border border-income-100 bg-income-50/40 px-3 py-2">
+              <p class="text-[11px] font-semibold uppercase tracking-wide text-income-700">
+                Pemasukan
+              </p>
+              <p id="sum-income-month" class="text-base font-bold text-income-700 mt-0.5">
+                Rp 0
+              </p>
+            </div>
+            <div class="rounded-xl border border-expense-100 bg-expense-50/40 px-3 py-2">
+              <p class="text-[11px] font-semibold uppercase tracking-wide text-expense-700">
+                Pengeluaran
+              </p>
+              <p id="sum-expense-month" class="text-base font-bold text-expense-700 mt-0.5">
+                Rp 0
+              </p>
+            </div>
+          </div>
+          <p id="count-month-total" class="text-xs text-slate-400 mt-3">
+            0 transaksi bulan ini
           </p>
         </div>
       </div>
@@ -1605,10 +1620,15 @@
         const totalEx = expense.reduce((s, t) => s + t.amount, 0);
         const balance = totalIn - totalEx;
         const todayIso = new Date().toISOString().split("T")[0];
+        const monthIso = todayIso.slice(0, 7);
         const incomeToday = income.filter((t) => t.date === todayIso);
         const expenseToday = expense.filter((t) => t.date === todayIso);
+        const incomeMonth = income.filter((t) => t.date.startsWith(monthIso));
+        const expenseMonth = expense.filter((t) => t.date.startsWith(monthIso));
         const totalInToday = incomeToday.reduce((s, t) => s + t.amount, 0);
         const totalExToday = expenseToday.reduce((s, t) => s + t.amount, 0);
+        const totalInMonth = incomeMonth.reduce((s, t) => s + t.amount, 0);
+        const totalExMonth = expenseMonth.reduce((s, t) => s + t.amount, 0);
 
         document.getElementById("sum-income").textContent = formatRp(totalIn);
         document.getElementById("sum-expense").textContent = formatRp(totalEx);
@@ -1623,10 +1643,19 @@
           formatRp(totalInToday);
         document.getElementById("sum-expense-today").textContent =
           formatRp(totalExToday);
+        document.getElementById("sum-income-month").textContent =
+          formatRp(totalInMonth);
+        document.getElementById("sum-expense-month").textContent =
+          formatRp(totalExMonth);
         document.getElementById("count-income-today").textContent =
           incomeToday.length + " transaksi";
         document.getElementById("count-expense-today").textContent =
           expenseToday.length + " transaksi";
+        document.getElementById("count-month-total").textContent =
+          incomeMonth.length + expenseMonth.length + " transaksi bulan ini";
+        document.getElementById("month-summary-label").textContent = new Date(
+          todayIso + "T00:00:00",
+        ).toLocaleDateString("id-ID", { month: "long", year: "numeric" });
 
         const balEl = document.getElementById("sum-balance");
         const labEl = document.getElementById("balance-label");
